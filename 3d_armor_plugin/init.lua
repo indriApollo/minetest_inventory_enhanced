@@ -43,3 +43,5 @@ inventory_enhanced.set_creative_formspec = function(player, start_i, pagenum)
 end
 
 -- integrate into survival inventory_enhanced
+
+minetest.log("action","3d_armor_plugin loaded")

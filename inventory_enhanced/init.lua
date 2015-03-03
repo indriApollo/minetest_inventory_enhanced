@@ -6,7 +6,7 @@ local trash = minetest.create_detached_inventory("trash", {
 	-- Allow the stack to be placed and remove it in on_put()
 	-- This allows the creative inventory to restore the stack
 	allow_put = function(inv, listname, index, stack, player)
-		if inventory_enhanced.player_gamemode_is_creative(player:get_player_name()) then
+		if creative_enhanced.player_gamemode_is_creative(player:get_player_name()) then
 			return stack:get_count()
 		else
 			return 0
@@ -19,7 +19,7 @@ local trash = minetest.create_detached_inventory("trash", {
 trash:set_size("main", 1)
 
 -- returns true if game is creative or if player has the 'creative' priv
-inventory_enhanced.player_gamemode_is_creative = function(name)
+creative_enhanced.player_gamemode_is_creative = function(name)
 	if minetest.setting_getbool("creative_mode")
 		or minetest.check_player_privs(name, {creative=true}) then
 
@@ -45,7 +45,7 @@ inventory_enhanced.init_creative_inventory = function(name)
 
 	minetest.create_detached_inventory("creative_"..name, {
 		allow_move = function(inv, from_list, from_index, to_list, to_index, count, player)
-			if inventory_enhanced.player_gamemode_is_creative(name) then
+			if creative_enhanced.player_gamemode_is_creative(name) then
 				return count
 			else
 				return 0
@@ -55,7 +55,7 @@ inventory_enhanced.init_creative_inventory = function(name)
 			return 0
 		end,
 		allow_take = function(inv, listname, index, stack, player)
-			if inventory_enhanced.player_gamemode_is_creative(name) then
+			if creative_enhanced.player_gamemode_is_creative(name) then
 				return -1
 			else
 				return 0
@@ -158,16 +158,10 @@ end
 
 --************************************
 
-
-minetest.register_privilege("creative", {
-	description = "Player has access to creative gamemode.",
-	give_to_singleplayer= false,
-})
-
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	-- Select the formspec according to player's gamemode
-	if inventory_enhanced.player_gamemode_is_creative(name) then
+	if creative_enhanced.player_gamemode_is_creative(name) then
 		inventory_enhanced.init_creative_inventory(player:get_player_name())
 		inventory_enhanced.set_creative_formspec(player, 0, 1)
 	else 
@@ -183,22 +177,16 @@ minetest.register_on_leaveplayer(function(player)
 	end
 end)
 
--- handle creative formspec
+-- Handle inventory formspec
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local name = player:get_player_name()
-	if not inventory_enhanced.player_gamemode_is_creative(name) then
-		-- Check if player got revoked
-		if inventory_enhanced[name] then
-			-- player goes back to survival
-			inventory_enhanced.set_survival_inventory(player)
-			inventory_enhanced[name] = nil
-		end
-		return false -- pass on to next formspec
-	-- Player has privilege, check if he has the according formspec
+	if not creative_enhanced.player_gamemode_is_creative(name) then
+		-- Player's gamemode is survival, nothing to handle
+		return true
 	elseif not inventory_enhanced[name] then
-		-- creative priv was just granted to player, update his formspec
+		-- Player changed his gamemode after join, change his inventory formspec accordingly
 		inventory_enhanced.init_creative_inventory(name)
-		return false -- pass on to next formspec
+		return true
 	end
 	-- Generate a new list if a new search term was entered or if cleared
 	if fields.clear then
@@ -234,3 +222,5 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	inventory_enhanced.set_creative_formspec(player, start_i, start_i / (6*4) + 1)
 	return true
 end)
+
+minetest.log("action","inventory_enhanced loaded")

@@ -1,18 +1,21 @@
 
-minetest.register_privilege("creative", {
-	description = "Player has access to creative gamemode.",
-	give_to_singleplayer= false,
-})
+creative_enhanced = {}
 
--- returns true if game is creative or if player has the 'creative' priv
+
+-- returns true if game is creative or if player is in creative gamemode
 creative_enhanced.player_gamemode_is_creative = function(name)
-	if minetest.setting_getbool("creative_mode")
-		or minetest.check_player_privs(name, {creative=true}) then
-
+	-- if world is creative, return true ofc
+	if minetest.setting_getbool("creative_mode") then
 		return true
-	else
-		return false
+	-- if player's gamemode value is set in table, check it
+	-- if player has already left and his entry was cleared,
+	-- we'll assume he is in survival mode
+	elseif gamemode.players[name] then
+		if gamemode.players[name] == 1 then
+			return true
+		end
 	end
+	return false
 end
 
 if minetest.setting_getbool("creative_mode") then
@@ -44,3 +47,5 @@ minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
 			return itemstack:take_item(1)
 		end
 end)
+
+minetest.log("action","creative_enhanced loaded")
