@@ -7,7 +7,7 @@ inventory_enhanced = {}
 -- Create the trash field
 local trash = minetest.create_detached_inventory("trash", {
 	on_put = function(inv, listname, index, stack, player)
-		stack:clear()
+	inv:set_list(listname, {})
 	end
 })
 trash:set_size("main", 1)
@@ -22,7 +22,6 @@ trash:set_size("main", 1)
 -- Create detached creative inventory when a new player joins
 inventory_enhanced.init_creative_inventory = function(player)
 	local name = player:get_player_name()
-print("trash "..dump(trash))
 	inventory_enhanced[name] = {}
 	inventory_enhanced[name]["size"] = 0
 	inventory_enhanced[name]["filter"] = " "
