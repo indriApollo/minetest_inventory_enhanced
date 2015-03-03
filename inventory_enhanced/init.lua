@@ -1,33 +1,16 @@
 
+-- TODO : add a recipes interface
+-- TODO : add a right panel for external mods' buttons
+
 inventory_enhanced = {}
 
 -- Create the trash field
 local trash = minetest.create_detached_inventory("trash", {
-	-- Allow the stack to be placed and remove it in on_put()
-	-- This allows the creative inventory to restore the stack
-	allow_put = function(inv, listname, index, stack, player)
-		if creative_enhanced.player_gamemode_is_creative(player:get_player_name()) then
-			return stack:get_count()
-		else
-			return 0
-		end
-	end,
 	on_put = function(inv, listname, index, stack, player)
-		inv:set_stack(listname, index, "")
-	end,
+		return 0
+	end
 })
 trash:set_size("main", 1)
-
--- returns true if game is creative or if player has the 'creative' priv
-creative_enhanced.player_gamemode_is_creative = function(name)
-	if minetest.setting_getbool("creative_mode")
-		or minetest.check_player_privs(name, {creative=true}) then
-
-		return true
-	else
-		return false
-	end
-end
 
 --************************************
 
@@ -37,8 +20,9 @@ end
 
 
 -- Create detached creative inventory when a new player joins
-inventory_enhanced.init_creative_inventory = function(name)
-
+inventory_enhanced.init_creative_inventory = function(player)
+	local name = player:get_player_name()
+print("trash "..dump(trash))
 	inventory_enhanced[name] = {}
 	inventory_enhanced[name]["size"] = 0
 	inventory_enhanced[name]["filter"] = " "
@@ -72,7 +56,10 @@ inventory_enhanced.init_creative_inventory = function(name)
 		end,
 	})
 
+	-- create the creative inventory for the first time with a blank filter
 	inventory_enhanced.filter_creative_inventory(name, " ")
+	-- set the right formspec
+	inventory_enhanced.set_creative_formspec(player, 0, 1)
 end
 
 -- set the creative inventory formspec
@@ -139,16 +126,16 @@ end
 
 inventory_enhanced.set_survival_inventory = function(player)
 	player:set_inventory_formspec(
-		"size[8,8.5]"..
+		"size[10,7.5]"..
 		default.gui_bg..
 		default.gui_bg_img..
 		default.gui_slots..
-		"list[current_player;main;0,4.25;8,1;]"..
-		"list[current_player;main;0,5.5;8,3;8]"..
-		"list[current_player;craft;1.75,0.5;3,3;]"..
-		"list[current_player;craftpreview;5.75,1.5;1,1;]"..
-		"image[4.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
-		default.get_hotbar_bg(0,4.25)
+		"list[current_player;main;2,3.5;8,1;]"..
+		"list[current_player;main;2,4.75;8,3;8]"..
+		"list[current_player;craft;5,0;3,3;]"..
+		"list[current_player;craftpreview;9,1;1,1;]"..
+		"image[8,1;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
+		default.get_hotbar_bg(2,3.5)
 	)
 end
 
@@ -160,10 +147,10 @@ end
 
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
+	
 	-- Select the formspec according to player's gamemode
 	if creative_enhanced.player_gamemode_is_creative(name) then
-		inventory_enhanced.init_creative_inventory(player:get_player_name())
-		inventory_enhanced.set_creative_formspec(player, 0, 1)
+		inventory_enhanced.init_creative_inventory(player)
 	else 
 		inventory_enhanced.set_survival_inventory(player)
 	end
@@ -177,15 +164,23 @@ minetest.register_on_leaveplayer(function(player)
 	end
 end)
 
+-- register an inventory change if gamemode is enabled
+if gamemode then
+	gamemode.register_on_change(function(name, mode)
+		local player = minetest.get_player_by_name(name)
+		if mode == 1 then
+			inventory_enhanced.init_creative_inventory(player)
+		elseif mode == 0 then
+			inventory_enhanced[name] = nil
+			inventory_enhanced.set_survival_inventory(player)
+		end
+	end)
+end
+
 -- Handle inventory formspec
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local name = player:get_player_name()
-	if not creative_enhanced.player_gamemode_is_creative(name) then
-		-- Player's gamemode is survival, nothing to handle
-		return true
-	elseif not inventory_enhanced[name] then
-		-- Player changed his gamemode after join, change his inventory formspec accordingly
-		inventory_enhanced.init_creative_inventory(name)
+	if not inventory_enhanced[name] then
 		return true
 	end
 	-- Generate a new list if a new search term was entered or if cleared

@@ -3,6 +3,7 @@
 minetest.register_on_joinplayer(function(player)
 local armor_inv = minetest.get_inventory({type="detached", name = player:get_player_name().."_armor"})
 armor_inv:set_size("armor", 5)
+armor:set_player_armor(player)
 end)
 
 -- disable the standard armor formspec
@@ -43,5 +44,24 @@ inventory_enhanced.set_creative_formspec = function(player, start_i, pagenum)
 end
 
 -- integrate into survival inventory_enhanced
+inventory_enhanced.set_survival_inventory = function(player)
+	local name = player:get_player_name()
+	player:set_inventory_formspec(
+		"size[10,7.5]"..
+		default.gui_bg..
+		default.gui_bg_img..
+		default.gui_slots..
+		"list[current_player;main;2,3.5;8,1;]"..
+		"list[current_player;main;2,4.75;8,3;8]"..
+		"list[current_player;craft;5,0;3,3;]"..
+		"list[current_player;craftpreview;9,1;1,1;]"..
+		"image[8,1;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
+		default.get_hotbar_bg(2,3.5)..
+
+		-- armor formspec
+		"list[detached:"..name.."_armor;armor;0.5,0;1,5;]"..
+		"image[3.1,0;2,3.5;"..armor.textures[name].preview.."]"
+	)
+end
 
 minetest.log("action","3d_armor_plugin loaded")

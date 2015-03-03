@@ -8,8 +8,7 @@ creative_enhanced.player_gamemode_is_creative = function(name)
 	if minetest.setting_getbool("creative_mode") then
 		return true
 	-- if player's gamemode value is set in table, check it
-	-- if player has already left and his entry was cleared,
-	-- we'll assume he is in survival mode
+	-- else assume he is in survival
 	elseif gamemode.players[name] then
 		if gamemode.players[name] == 1 then
 			return true
@@ -42,7 +41,7 @@ end
 
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack)
 		if creative_enhanced.player_gamemode_is_creative(placer:get_player_name()) then
-			return true -- nothing is taken from inventory
+			return itemstack -- nothing is taken from inventory
 		else 
 			return itemstack:take_item(1)
 		end
