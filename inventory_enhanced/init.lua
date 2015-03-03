@@ -7,7 +7,7 @@ inventory_enhanced = {}
 -- Create the trash field
 local trash = minetest.create_detached_inventory("trash", {
 	on_put = function(inv, listname, index, stack, player)
-		return 0
+		stack:clear()
 	end
 })
 trash:set_size("main", 1)
