@@ -125,16 +125,18 @@ end
 
 inventory_enhanced.set_survival_inventory = function(player)
 	player:set_inventory_formspec(
-		"size[10,7.5]"..
+		"size[8,7.5]"..
 		default.gui_bg..
 		default.gui_bg_img..
 		default.gui_slots..
-		"list[current_player;main;2,3.5;8,1;]"..
-		"list[current_player;main;2,4.75;8,3;8]"..
-		"list[current_player;craft;5,0;3,3;]"..
-		"list[current_player;craftpreview;9,1;1,1;]"..
-		"image[8,1;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
-		default.get_hotbar_bg(2,3.5)
+		"list[current_player;main;0,3.5;8,1;]"..
+		"list[current_player;main;0,4.75;8,3;8]"..
+		"list[current_player;craft;3,0;3,3;]"..
+		"list[current_player;craftpreview;7,1;1,1;]"..
+		"image[6,1;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
+		"image[0.1,2.1;0.8,0.8;trash.png]"..
+		"list[detached:trash;main;0,2;1,1;]"..
+		default.get_hotbar_bg(0,3.5)
 	)
 end
 
