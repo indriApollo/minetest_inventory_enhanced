@@ -266,7 +266,7 @@ end
 -- Handle inventory formspec
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	print(dump(fields))
-	if fields.quit return true end
+	if fields.quit then return true end
 	local name = player:get_player_name()
 	if fields.filter == "" then
 		fields.filter = " "
