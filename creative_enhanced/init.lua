@@ -41,9 +41,9 @@ end
 
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack)
 		if creative_enhanced.player_gamemode_is_creative(placer:get_player_name()) then
-			return itemstack -- nothing is taken from inventory
+			return true -- nothing is taken from inventory
 		else 
-			return itemstack:take_item(1)
+			return false -- pass over to mods
 		end
 end)
 

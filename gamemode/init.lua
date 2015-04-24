@@ -85,6 +85,8 @@ gamemode.set_mode = function(name, mode)
 	end
 end
 
+-- gamemode API
+-- register a function which gets executed when the gamemode of a player is changed
 gamemode.register_on_change = function(func)
 	table.insert(gamemode.functions, func)
 end

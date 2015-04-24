@@ -1,3 +1,0 @@
-default
-inventory_enhanced
-3d_armor
