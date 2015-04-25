@@ -17,6 +17,8 @@ Depends on default, creative_enhanced and (optionnaly) gamemode
 
 **gamemode**
 
+Requires the 'gamemode' privilege.
+
 This component adds the ability to dynamically change your gamemode.
 Commands are:
 
