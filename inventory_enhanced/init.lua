@@ -66,7 +66,7 @@ inventory_enhanced.set_creative_formspec = function(player, start_i, pagenum)
 			default.gui_bg_img..
 			default.gui_slots..
 			"list[current_player;main;5,3.5;8,1;]"..
-			"list[current_player;main;5,4.75;8,3;8]"..
+			"list[current_player;main;5,4.75;8,3;]"..
 			"list[current_player;craft;8,0;3,3;]"..
 			"list[current_player;craftpreview;12,1;1,1;]"..
 			"image[11,1;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
@@ -227,7 +227,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local start_i = find_i()
 		update_formspec(player, start_i, start_i / 24 + 1)
 	end
-	return true
 end)
 
 minetest.log("action","inventory_enhanced loaded")
