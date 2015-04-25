@@ -57,4 +57,5 @@ end
 
 GNU lgpl 2.1
 
- 
+**Credit: **
+Based on the default mod 'creative' by Perttu Ahola (celeron55) <celeron55@gmail.com>
