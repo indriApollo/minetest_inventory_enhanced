@@ -9,6 +9,10 @@ local trash = minetest.create_detached_inventory("trash", {
 })
 trash:set_size("main", 1)
 
+if creative_inventory then --disable default creative inventory
+	creative_inventory.set_creative_formspec = function(a,b,c) return end
+end
+
 --************************************
 
 -- CREATIVE
