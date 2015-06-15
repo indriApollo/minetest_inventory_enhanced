@@ -9,7 +9,7 @@ creative_enhanced.player_gamemode_is_creative = function(name)
 		return true
 	-- if player's gamemode value is set in table, check it
 	-- else assume he is in survival
-	elseif gamemode.players[name] then
+	elseif gamemode and gamemode.players then
 		if gamemode.players[name] == 1 then
 			return true
 		end
