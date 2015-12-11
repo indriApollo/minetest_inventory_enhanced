@@ -47,4 +47,13 @@ minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
 		end
 end)
 
+-- overwrite core function and use own gamemode check
+old_rotate_and_place = minetest.rotate_and_place
+minetest.rotate_and_place = function(itemstack, placer, pointed_thing,infinitestacks, orient_flags)
+	if creative_enhanced.player_gamemode_is_creative(placer:get_player_name()) then
+		infinitestacks = true
+	end
+	return old_rotate_and_place(itemstack, placer, pointed_thing,infinitestacks, orient_flags)
+end
+
 minetest.log("action","creative_enhanced loaded")
