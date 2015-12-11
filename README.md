@@ -1,6 +1,6 @@
 # minetest_inventory_enhanced
 
-Note: creative_enhanced and inventory_enhanced are interdepedendent. gamemode is optional
+Note: creative_enhanced and inventory_enhanced are interdepedendent, gamemode is optional.
 
 **creative_enhanced**
 
@@ -59,5 +59,6 @@ end
 
 GNU lgpl 2.1
 
-**Credit: **
+**Credit :**
+
 Based on the default mod 'creative' by Perttu Ahola (celeron55) <celeron55@gmail.com>
