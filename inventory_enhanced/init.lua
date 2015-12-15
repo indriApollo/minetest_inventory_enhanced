@@ -59,13 +59,13 @@ inventory_enhanced.init_creative_inventory = function(player)
 end
 
 -- set the creative inventory formspec
-inventory_enhanced.set_creative_formspec = function(player, start_i, pagenum)
+inventory_enhanced.set_creative_formspec = function(player, start_i)
 	local name = player:get_player_name()
 	local filter = inventory_enhanced[name]["filter"]
-	pagenum = math.floor(pagenum)
+	pagenum = math.floor(start_i / 24 + 1)
 	local pagemax = math.floor((inventory_enhanced[name]["size"]-1) / (6*4) + 1)
-	player:set_inventory_formspec(
-			"size[13,7.5]"..
+
+	local inv = "size[13,7.5]"..
 			default.gui_bg..
 			default.gui_bg_img..
 			default.gui_slots..
@@ -84,7 +84,13 @@ inventory_enhanced.set_creative_formspec = function(player, start_i, pagenum)
 			"button[3.3,0.2;0.8,0.5;clear;X]"..
 			"field[0.3,0.3;2.6,1;filter;;"..filter.."]"..
 			default.get_hotbar_bg(5,3.5)
-	)
+
+	if armor then
+		 inv = inv..
+			"list[detached:"..name.."_armor;armor;5,0;2,3;]"..
+			"image[6.8,0.35;1.5,3;"..armor.textures[name].preview.."]"
+	end
+	player:set_inventory_formspec(inv)
 end
 
 -- update the creative inventory whith searched content
@@ -121,8 +127,8 @@ end
 
 
 inventory_enhanced.set_survival_formspec = function(player)
-	player:set_inventory_formspec(
-		"size[8,7.5]"..
+	local name = player:get_player_name()
+	local inv = "size[8,7.5]"..
 		default.gui_bg..
 		default.gui_bg_img..
 		default.gui_slots..
@@ -134,7 +140,14 @@ inventory_enhanced.set_survival_formspec = function(player)
 		"image[0.1,2.1;0.8,0.8;trash.png]"..
 		"list[detached:trash;main;0,2;1,1;]"..
 		default.get_hotbar_bg(0,3.5)
-	)
+
+	if armor then
+		inv = inv..
+		"list[detached:"..name.."_armor;armor;0,0;2,3;]"..
+		"image[1.8,0.35;1.5,3;"..armor.textures[name].preview.."]"
+	end
+
+	player:set_inventory_formspec(inv)
 end
 
 --************************************
@@ -212,9 +225,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		inventory_enhanced[name].filter = filter-- update the context accordingly
 	end
 
-	local update_formspec = function(player, start_i, pagenum)
+	local update_formspec = function(player, start_i)
 		if creative_enhanced.player_gamemode_is_creative(name) then
-			inventory_enhanced.set_creative_formspec(player, start_i, pagenum)
+			inventory_enhanced.set_creative_formspec(player, start_i)
 		else
 			inventory_enhanced.set_survival_formspec(player)
 		end
@@ -229,8 +242,31 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		update_formspec(player, 0, 1) -- reset to page 1
 	elseif fields.search_previous or fields.search_next then
 		local start_i = find_i()
-		update_formspec(player, start_i, start_i / 24 + 1)
+		update_formspec(player, start_i)
 	end
 end)
+
+--************************************
+
+-- 3d_armor
+
+--************************************
+if armor then
+	-- Ugly workaround !
+	-- override armor.set_player_armor which is called when placing/removing
+	-- armor pieces in the inventory. We update the formspec to display the
+	-- dynamic preview changes
+	inventory_enhanced.set_player_armor = armor.set_player_armor
+	armor.set_player_armor = function(self,player)
+		local name = player:get_player_name()
+		inventory_enhanced.set_player_armor(self,player)
+		if creative_enhanced.player_gamemode_is_creative(name) then
+			local start_i = inventory_enhanced[name].start_i
+			inventory_enhanced.set_creative_formspec(player, start_i)
+		else
+			inventory_enhanced.set_survival_formspec(player)
+		end
+	end
+end
 
 minetest.log("action","inventory_enhanced loaded")
